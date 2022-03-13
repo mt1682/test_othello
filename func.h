@@ -18,11 +18,12 @@ void flipLongtitudinal(int x, int y, int color);
 void flipDiagonal(int x, int y, int color);
 int randomPlay(int color);
 bool cntZero(void);
-int cntScore(void);
+int cntScore(int color);
 void copyDisk(Disk DISK_COPY[], Disk DISK_ORG[]);
 void saveDisk(void);
 void restoreDisk(void);
 int allSearch(int color);
 int play(int x, int y, int color);
+int additionalScore(int color);
 
 #endif

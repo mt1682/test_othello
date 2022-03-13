@@ -20,12 +20,15 @@ int main() {
 
     init();
     print();
+    int me;
+    printf("黒なら1, 白なら2, input: ");
+    scanf("%d", &me);
 
     for (int i = 0; i < 200; i++) {
         f = 0;
         printf("now player: %d\n", nowPlayer);
 
-        if (nowPlayer == -2) {
+        if (nowPlayer == -3 - me) {
             printf("input: ");
             scanf("%d%d", &x, &y);
             if (x == -1) {
@@ -39,13 +42,16 @@ int main() {
         } else if (nowPlayer == 2) {
             nowPlayer = randomPlay(nowPlayer);
             print();
-        } else if (nowPlayer == 1) {
-            position = getXY(allSearch(nowPlayer));
+        } else if (nowPlayer == me) {
+            int bestPosition = allSearch(nowPlayer);
+            if (bestPosition == -1) {
+                nowPlayer = 3 - nowPlayer;
+                continue;
+            }
+            position = getXY(bestPosition);
             x = position / 10;
             y = position % 10;
         RE:
-            // printf("input: ");
-            // scanf("%d%d", &x, &y);
             position = get64(x, y);
             nowPlayer = play(x, y, nowPlayer);
             if (nowPlayer == -1) {
@@ -63,7 +69,7 @@ int main() {
         }
     }
 
-    int score1 = cntScore();
+    int score1 = cntScore(me);
 
     printf("%d %d\n", score1, 64 - score1);
     return 0;

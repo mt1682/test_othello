@@ -425,16 +425,23 @@ bool cntZero(void) {
     return true;
 }
 
-int cntScore(void) {
-    int cnt1 = 0, cnt2 = 0;
-    for (int i = 0; i < BOARD_SIZE; i++) {
-        if (DISK[i].getColor() == 1) {
-            cnt1++;
-        } else if (DISK[i].getColor() == 2) {
-            cnt2++;
+int cntScore(int color) {
+    int cnt = 0;
+    if (color == 1) {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            if (DISK[i].getColor() == 1) {
+                cnt++;
+            }
+        }
+    } else if (color == 2) {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            if (DISK[i].getColor() == 2) {
+                cnt++;
+            }
         }
     }
-    return cnt1;
+
+    return cnt;
 }
 
 void copyDisk(Disk DISK_COPY[], Disk DISK_ORG[]) {
@@ -464,7 +471,7 @@ int allSearch(int color) {
     int buffColor = color;
     int score = 0;
     int maxScore = INT_MIN;
-    int bestposition = 0;
+    int bestposition = -1;
     saveDisk();
 
     for (int y = 0; y < BOARD_HIGHT - 2; y++) {
@@ -476,22 +483,12 @@ int allSearch(int color) {
                 continue;
             }
             setDisk(x, y, color);
-            // printf("first OK: %d %d\n", x, y);
             if (!isSafe(x, y, color)) {
                 DISK[position].init();
                 continue;
             }
-            /*
-            for (int j = 0; j < 9; j++) {
-                printf("%d ", DISK[position].near[j]);
-            }
-            printf("\n");
-            */
-            // printf("OK: %d %d\n", x, y);
 
-            // DISK[position].init();
-
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 50; i++) {
                 setDisk(x, y, color);
                 flipDisk(x, y, color);
                 DISK[position].set(color);
@@ -505,23 +502,12 @@ int allSearch(int color) {
                     }
                 }
                 // printf("YES\n");
-                if (cntScore() - 40 > 0) {
+                if (cntScore(buffColor) - 32 > 0) {
                     score++;
                 } else {
                     score--;
                 }
-                if (DISK[get64(0, 0)].getColor() == 1) {
-                    score++;
-                }
-                if (DISK[get64(7, 0)].getColor() == 1) {
-                    score++;
-                }
-                if (DISK[get64(7, 7)].getColor() == 1) {
-                    score++;
-                }
-                if (DISK[get64(0, 7)].getColor() == 1) {
-                    score++;
-                }
+                score + additionalScore(buffColor);
 
                 // score += cntScore();
                 restoreDisk();
@@ -545,6 +531,90 @@ int allSearch(int color) {
     return bestposition;
 }
 
+int additionalScore(int color) {
+    int score = 0;
+    if (DISK[get64(0, 0)].getColor() == color) {
+        score += 4;
+    }
+    if (DISK[get64(7, 0)].getColor() == color) {
+        score += 4;
+    }
+    if (DISK[get64(7, 7)].getColor() == color) {
+        score += 4;
+    }
+    if (DISK[get64(0, 7)].getColor() == color) {
+        score += 4;
+    }
+
+    if (DISK[get64(0, 0)].getColor() == 3 - color) {
+        score -= 4;
+    }
+    if (DISK[get64(7, 0)].getColor() == 3 - color) {
+        score -= 4;
+    }
+    if (DISK[get64(7, 7)].getColor() == 3 - color) {
+        score -= 4;
+    }
+    if (DISK[get64(0, 7)].getColor() == 3 - color) {
+        score -= 4;
+    }
+
+    for (int i = 2; i <= 5; i++) {
+        if (DISK[get64(i, 0)].getColor() == color) {
+            score += 2;
+        }
+        if (DISK[get64(i, 7)].getColor() == color) {
+            score += 2;
+        }
+        if (DISK[get64(0, i)].getColor() == color) {
+            score += 2;
+        }
+        if (DISK[get64(7, i)].getColor() == color) {
+            score += 2;
+        }
+    }
+
+    if (DISK[get64(1, 0)].getColor() == color) {
+        score--;
+    }
+    if (DISK[get64(6, 0)].getColor() == color) {
+        score--;
+    }
+    if (DISK[get64(6, 7)].getColor() == color) {
+        score--;
+    }
+    if (DISK[get64(1, 7)].getColor() == color) {
+        score--;
+    }
+    if (DISK[get64(0, 1)].getColor() == color) {
+        score--;
+    }
+    if (DISK[get64(7, 1)].getColor() == color) {
+        score--;
+    }
+    if (DISK[get64(0, 6)].getColor() == color) {
+        score--;
+    }
+    if (DISK[get64(7, 6)].getColor() == color) {
+        score--;
+    }
+
+    if (DISK[get64(1, 1)].getColor() == color) {
+        score--;
+    }
+    if (DISK[get64(6, 1)].getColor() == color) {
+        score--;
+    }
+    if (DISK[get64(1, 6)].getColor() == color) {
+        score--;
+    }
+    if (DISK[get64(6, 6)].getColor() == color) {
+        score--;
+    }
+
+    return score;
+}
+
 int play(int x, int y, int color) {
     setDisk(x, y, color);
     if (isSafe(x, y, color) == false) {
@@ -556,3 +626,5 @@ int play(int x, int y, int color) {
     color = 3 - color;
     return color;
 }
+
+int test(int x, int y, int color) { return 0; }
